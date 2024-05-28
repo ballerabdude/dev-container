@@ -1,0 +1,42 @@
+# Shared file system storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dev-container-fs
+  namespace: dev-container
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: azurefile-csi-premium
+  resources:
+    requests:
+      storage: 5Gi
+---
+# Home directory storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: home-pvc
+  namespace: dev-container
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+# Docker in Docker (DinD) storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dind-storage
+  namespace: dev-container
+  labels:
+    app: dev-container
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: managed-csi

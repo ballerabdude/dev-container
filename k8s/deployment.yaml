@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-container
+---  
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-container
+  labels:
+    app: dev-container
+  namespace: dev-container
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev-container
+  template:
+    metadata:
+      labels:
+        app: dev-container 
+    spec:
+      tolerations:
+        - key: "kubernetes.azure.com/scalesetpriority"
+          operator: "Equal"
+          value: "spot"
+          effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: "kubernetes.azure.com/scalesetpriority"
+                operator: In
+                values:
+                - spot
+      initContainers:
+      - name: volume-mount-hack
+        image: busybox
+        # Create /home/vscode if it doesn't exist and set the owner to the vscode user. This is to make the home directory owned by the vscode user.
+        command: ["sh", "-c", "test -d /home/vscode || (mkdir -p /home/vscode && chown 1000:1000 /home/vscode)"]
+        volumeMounts:
+        - name: home
+          mountPath: /home
+      containers:
+      - name: dev-container
+        image: pmaicr.azurecr.io/dev-container:ubuntu-22.04
+        imagePullPolicy: Always
+        env:
+          - name: DOCKER_HOST 
+            value: tcp://localhost:2376
+          - name: DOCKER_TLS_VERIFY
+            value: "1"
+          - name: DOCKER_CERT_PATH
+            value: /home/vscode/docker-cert-path/client
+        volumeMounts:
+        - name: home
+          mountPath: /home
+        - name: shared-fs
+          mountPath: /mnt/shared
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/ready
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+      - name: dind-daemon 
+        image: docker:24-dind 
+        securityContext: 
+            privileged: true
+        volumeMounts: 
+          - name: docker-storage 
+            mountPath: /var/lib/docker
+          - mountPath: /certs
+            name: home
+            subPath: vscode/docker-cert-path
+      volumes:
+      - name: home
+        persistentVolumeClaim:
+          claimName: home-pvc
+      - name: shared-fs
+        persistentVolumeClaim:
+          claimName: dev-container-fs
+      - name: docker-storage
+        persistentVolumeClaim:
+          claimName: dind-storage
+          readOnly: false
