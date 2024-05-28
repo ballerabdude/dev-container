@@ -1,17 +1,18 @@
 # Shared file system storage
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: dev-container-fs
-  namespace: dev-container
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: azurefile-csi-premium
-  resources:
-    requests:
-      storage: 5Gi
----
+# comment out the following shared file system storage PVC since smb is blocked on my ISP
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: dev-container-fs
+#   namespace: dev-container
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   storageClassName: azurefile-csi-premium
+#   resources:
+#     requests:
+#       storage: 5Gi
+# ---
 # Home directory storage
 apiVersion: v1
 kind: PersistentVolumeClaim

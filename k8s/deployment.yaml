@@ -58,8 +58,8 @@ spec:
         volumeMounts:
         - name: home
           mountPath: /home
-        - name: shared-fs
-          mountPath: /mnt/shared
+        # - name: shared-fs
+        #   mountPath: /mnt/shared
         readinessProbe:
           exec:
             command:
@@ -82,9 +82,9 @@ spec:
       - name: home
         persistentVolumeClaim:
           claimName: home-pvc
-      - name: shared-fs
-        persistentVolumeClaim:
-          claimName: dev-container-fs
+      # - name: shared-fs
+      #   persistentVolumeClaim:
+      #     claimName: dev-container-fs
       - name: docker-storage
         persistentVolumeClaim:
           claimName: dind-storage
