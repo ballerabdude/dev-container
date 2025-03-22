@@ -20,18 +20,73 @@ During startup the dotfiles are copied to the home directory of the user but are
 
 ## Usage
 
-[Attach VS Code to a Kubernetes container](https://code.visualstudio.com/docs/devcontainers/attach-container#:~:text=To%20attach%20to%20a%20container,want%20to%20attach%20to%20resides.)
+### Running Locally with Docker
+
+To run the development container locally:
+
+1. Navigate to a directory where you want to store your dev container files:
+   ```bash
+   # Choose any directory where you want to store your work
+   cd ~/Documents     # for macOS/Linux
+   # or
+   cd %USERPROFILE%\Documents     # for Windows Command Prompt
+   # or
+   cd $env:USERPROFILE\Documents  # for Windows PowerShell
+   ```
+
+2. Create a `dev-container` directory:
+   ```bash
+   mkdir dev-container
+   cd dev-container
+   ```
+
+3. Run the container:
+   ```bash
+   docker run -d -v ${PWD}:/home ghcr.io/ballerabdude/dev-container:latest
+   ```
+   
+   On Windows Command Prompt:
+   ```cmd
+   docker run -d -v %cd%:/home ghcr.io/ballerabdude/dev-container:latest
+   ```
+   
+   On Windows PowerShell:
+   ```powershell
+   docker run -d -v ${PWD}:/home ghcr.io/ballerabdude/dev-container:latest
+   ```
+
+4. Verify the container is running:
+   ```bash
+   docker ps
+   ```
+
+5. Access the container shell:
+   ```bash
+   docker exec -it CONTAINER_ID /bin/bash
+   ```
+   Replace `CONTAINER_ID` with the ID from the `docker ps` command.
+   
+### Using Docker Desktop Alternatives
+
+If you prefer not to use Docker Desktop, see [PODMAN_INSTRUCTIONS.md](PODMAN_INSTRUCTIONS.md) for details on how to run this container using Podman.
+
+### Building from Source
 
 To build the Docker image for the development environment, run the following command:
 
 ```sh
 docker build -t dev-container .
 ```
+
+### Kubernetes Deployment
+
 To deploy the development environment on Kubernetes, run the following commands:
 ```sh
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/pvc.yaml
 ```
+
+[Attach VS Code to a Kubernetes container](https://code.visualstudio.com/docs/devcontainers/attach-container#:~:text=To%20attach%20to%20a%20container,want%20to%20attach%20to%20resides.)
 
 ### GitHub Container Registry
 
