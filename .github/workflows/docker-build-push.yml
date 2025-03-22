@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '33 6 * * *'  # Run daily at 6:33 AM UTC
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
     paths:
@@ -12,7 +12,7 @@ on:
       - 'dev-container/init-container.sh'
       - 'dev-container/.github/workflows/docker-build-push.yml'
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
     paths:
       - 'dev-container/Dockerfile'
       - 'dev-container/init-container.sh'
@@ -74,7 +74,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
-          context: ./dev-container
+          context: .
           file: ./dev-container/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
